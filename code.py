@@ -7,13 +7,6 @@ from adafruit_hid.keycode import Keycode
 
 keyboard = Keyboard(usb_hid.devices)
 
-print("Available pins on your board:")
-for pin_name in dir(board):
-    if not pin_name.startswith('_'):
-        print(f"  {pin_name}")
-
-print("\n" + "="*50 + "\n")
-
 key_mappings = [
     (Keycode.ONE, "1"),
     (Keycode.TWO, "2"),
@@ -43,26 +36,19 @@ try:
         except:
             pass
 
-    if pins:
         previous_states = [True] * len(pins)
         
-        while True:
-            for i, pin in enumerate(pins):
-                current_state = pin.value
-                
-                if previous_states[i] and not current_state:
-                    keycode, key_name = key_mappings[i]
-                    print(f"Pin {pin_names[i]} pressed -> Sending key: {key_name}")
-                    keyboard.send(keycode)
-                
-                elif not previous_states[i] and current_state:
-                    print(f"Pin {pin_names[i]} released")
-                
-                previous_states[i] = current_state
+    while True:
+        for i, pin in enumerate(pins):
+            current_state = pin.value
             
-            time.sleep(0.01)
-    else:
-        print("Could not configure any pins!")
+            if previous_states[i] and not current_state:
+                keycode, key_name = key_mappings[i]
+                keyboard.send(keycode)
+            
+            previous_states[i] = current_state
         
+        time.sleep(0.01)
+    
 except Exception as e:
     print(f"Error setting up keyboard: {e}")
